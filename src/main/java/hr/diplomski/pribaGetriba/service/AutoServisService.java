@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import hr.diplomski.pribaGetriba.model.Stranka;
 import hr.diplomski.pribaGetriba.mapping.ObjectMapping;
 import hr.diplomski.pribaGetriba.model.Automobil;
+import hr.diplomski.pribaGetriba.model.Djelatnik;
 import hr.diplomski.pribaGetriba.model.Nalog;
+import hr.diplomski.pribaGetriba.model.NoviDjelatnik;
 import hr.diplomski.pribaGetriba.model.NoviNalog;
 import hr.diplomski.pribaGetriba.model.Racun;
 import hr.diplomski.pribaGetriba.model.SingleDataResponse;
@@ -25,6 +27,13 @@ public class AutoServisService {
 		return autoServisRepository.insertStranke(stranka);
 	}
 	
+	public SingleDataResponse noviDjelatnik(Djelatnik djelatnik) {
+		
+		SingleDataResponse response = autoServisRepository.dodajDjelatnika(djelatnik);
+	
+		return response;
+	
+	}
 	
 	public SingleDataResponse NoviNalog(NoviNalog noviNalog) {
 		
@@ -87,6 +96,14 @@ public class AutoServisService {
 		return autoServisRepository.dohvatiNalogePoStranci(id);
 	}
 	
+	public List<Djelatnik> dohvatiDjelatnike(){
+		return autoServisRepository.djelatnici();
+	}
+	
+	public SingleDataResponse obrisiDjelatnika(int id){
+		return autoServisRepository.obrisiDjelatnika(id);
+	}
+	
 	public String preuzmiNalog(String brojNaloga, String radnikId) {
 		return autoServisRepository.preuzmiNalog(brojNaloga, radnikId);
 			
@@ -108,5 +125,7 @@ public class AutoServisService {
 	public Racun dohvatiRacun(String username, String password) {
 		return autoServisRepository.dohvatiRacun(username, password);
 	}
+	
+
 
 }

@@ -14,7 +14,9 @@ import hr.diplomski.pribaGetriba.model.Osoba;
 import hr.diplomski.pribaGetriba.model.Racun;
 import hr.diplomski.pribaGetriba.model.SingleDataResponse;
 import hr.diplomski.pribaGetriba.model.Automobil;
+import hr.diplomski.pribaGetriba.model.Djelatnik;
 import hr.diplomski.pribaGetriba.model.Nalog;
+import hr.diplomski.pribaGetriba.model.NoviDjelatnik;
 import hr.diplomski.pribaGetriba.model.Stranka;
 import hr.diplomski.pribaGetriba.model.NoviNalog;
 import hr.diplomski.pribaGetriba.service.AutoServisService;
@@ -32,6 +34,16 @@ public class AutoServisController {
 	public SingleDataResponse NoviNalog(@RequestBody NoviNalog noviNalog){
 		
 		return autoServisService.NoviNalog(noviNalog);
+		
+	}
+	
+	@CrossOrigin(origins = "http://localhost:3000")
+	@PostMapping("/noviDjelatnik")
+	public SingleDataResponse noviDjelatnik(@RequestBody Djelatnik djelatnik){
+		
+		System.out.println("pozvan servis noviDjelatnik");
+		return autoServisService.noviDjelatnik(djelatnik);
+		
 		
 	}
 	
@@ -59,6 +71,21 @@ public class AutoServisController {
 		
 	}
 	
+	@CrossOrigin(origins = "http://localhost:3000")
+	@GetMapping("/djelatnici")
+	public List<Djelatnik> dohvatiDjelatnike(){
+		
+		return autoServisService.dohvatiDjelatnike();
+		
+	}
+	
+	@CrossOrigin(origins = "http://localhost:3000")
+	@GetMapping("/obrisiDjelatnika")
+	public SingleDataResponse obrisiDjelatnika(int id){
+		
+		return autoServisService.obrisiDjelatnika(id);
+		
+	}
 
 	
 	@CrossOrigin(origins = "http://localhost:3000")

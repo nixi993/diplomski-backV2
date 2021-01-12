@@ -14,8 +14,8 @@ public class EmailService {
     public void posaljiMailKlijentu(String emailTo,String username,String password) {
     	
     	try {
-	        SimpleMailMessage message = new SimpleMailMessage(); 
-	        
+    		
+	        SimpleMailMessage message = new SimpleMailMessage();         
 	        message.setFrom("nikola.pribanic93@gmail.com");
 	        message.setTo(emailTo); 
 	        message.setSubject("Status vozila"); 

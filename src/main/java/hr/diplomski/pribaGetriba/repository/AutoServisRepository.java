@@ -15,12 +15,14 @@ import org.springframework.stereotype.Repository;
 
 import hr.diplomski.pribaGetriba.model.Automobil;
 import hr.diplomski.pribaGetriba.model.Djelatnik;
-import hr.diplomski.pribaGetriba.model.DjelatnikRowMapper;
 import hr.diplomski.pribaGetriba.model.Nalog;
+import hr.diplomski.pribaGetriba.model.NoviDjelatnik;
 import hr.diplomski.pribaGetriba.model.NoviNalog;
 import hr.diplomski.pribaGetriba.model.Racun;
+import hr.diplomski.pribaGetriba.model.SingleDataResponse;
 import hr.diplomski.pribaGetriba.model.Stranka;
 import hr.diplomski.pribaGetriba.model.mapper.AutomobilRowMapper;
+import hr.diplomski.pribaGetriba.model.mapper.DjelatnikRowMapper;
 import hr.diplomski.pribaGetriba.model.mapper.NalogRowMapper;
 import hr.diplomski.pribaGetriba.model.mapper.RacunRowMapper;
 import hr.diplomski.pribaGetriba.model.mapper.StrankaRowMapper;
@@ -73,6 +75,8 @@ public class AutoServisRepository {
 		return nalozi;
 		
 	}
+	
+
 	public List<Nalog> dohvatiNalogePoDjelatniku(String id) {
 		
 		List<Nalog> nalozi = new ArrayList<Nalog>();
@@ -100,6 +104,17 @@ public class AutoServisRepository {
 		return nalozi;
 			
 			
+	}
+	public List<Djelatnik> djelatnici(){
+		
+		String sql ="select djel.id id, ime,prezime,telefon,email,username,password,naziv_uloge from pribaGetriba.dbo.Djelatnik djel "+ 
+				  "join pribaGetriba.dbo.Racun rac on djel.racun_id = rac.id "+
+				  "where sifra_uloge != 100";
+	
+		List<Djelatnik> djelatnici = jdbcTemplate.query(sql, new DjelatnikRowMapper());
+		
+		return djelatnici;
+		
 	}
 	
 	public List<Nalog> dohvatiNalogePoStranci(String id) {
@@ -130,7 +145,10 @@ public class AutoServisRepository {
 		
 	
 		
-}
+	}
+	
+
+	
 	public String insertStranke(Stranka stranka) {
 		
 		String sql;
@@ -228,7 +246,7 @@ public class AutoServisRepository {
 
 			
 			int inserted = jdbcTemplate.update(sql,noviNalog.getVin(),noviNalog.getOib(),noviNalog.getOpisKvara(),"Zaprimljeno", new Date(),username,password,13);
-			
+
 		
 			if(inserted == 1) {
 				emailService.posaljiMailKlijentu(emailTo, username, password);
@@ -365,4 +383,86 @@ public class AutoServisRepository {
 	    
 	    return brojNaloga;
 	}
+	
+	public int dohvatiIdRacuna(String nazivUloge) {
+		
+		try {
+			
+			String sql = "select id from pribaGetriba.dbo.Racun where naziv_uloge = ?";
+			
+			int id = (int) jdbcTemplate.queryForObject(
+		            sql, new Object[] { nazivUloge }, int.class);
+			
+			return id;
+			
+		}catch(Exception ex) {
+			System.out.println("dohvatiIdRacuna - " + ex.getMessage());
+			throw ex;
+		}
+	}
+	
+	public SingleDataResponse dodajDjelatnika(Djelatnik noviDjelatnik) {
+		
+		
+		SingleDataResponse response = new SingleDataResponse();
+		String sql ="";
+		int inserted = 0;
+		try {
+			
+			int racunId = dohvatiIdRacuna(noviDjelatnik.getVrstaDjelatnika());
+			
+		
+				sql = "insert into pribaGetriba.dbo.Djelatnik(ime,prezime,telefon,email,username,password,racun_id) "+
+						"values(?,?,?,?,?,?,?)";
+						
+				inserted = jdbcTemplate.update(sql, noviDjelatnik.getIme(), noviDjelatnik.getPrezime(),
+						noviDjelatnik.getTelefon(), noviDjelatnik.getEmail(), noviDjelatnik.getUsername(),
+						noviDjelatnik.getPassword(), racunId);		
+				
+				if(inserted == 1) {
+					response.setSuccess(true);
+					response.setData("1");
+			
+				}else{
+					response.setSuccess(false);
+					response.setData("Greska u unosu djelatnika");
+				}
+			
+		}catch(Exception ex) {
+			System.out.println("dodajDjelatnika - " + ex.getMessage());
+			response.setSuccess(false);
+			response.setData("Greska u unosu djelatnika");
+		}
+		return response;
+
+	}
+	
+	public SingleDataResponse obrisiDjelatnika(int id) {
+		
+		SingleDataResponse response = new SingleDataResponse();
+		
+		try {
+			String sql = "delete from pribaGetriba.dbo.Djelatnik "+
+					"where id =" + id;
+		
+		
+			int deleted = jdbcTemplate.update(sql);
+			
+			response.setSuccess(true);
+			response.setData(deleted == 1 ? "1" : "Neuspješno brisanje iz baze.");
+			
+			
+		}catch(Exception ex) {
+			System.out.println("obrisiDjelatnika - " + ex.getMessage());
+			response.setSuccess(false);
+			response.setData("obrisiDjelatnika error");
+		}
+		
+				
+				
+		return response;
+		
+	}
+	
+	
 }
